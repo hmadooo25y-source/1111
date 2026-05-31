@@ -75,14 +75,10 @@ function executeScreenSwitch(targetKey) {
         const blockScreens = ['login', 's1', 's4', 's6', 'notif'];
         targetScreen.style.display = blockScreens.includes(targetKey) ? 'block' : 'flex';
 
-        if (targetKey === 'login' || targetKey === 's1' || targetKey === 'notif') {
-            document.body.style.overflow = 'auto';
-            document.body.style.position = 'static';
-        } else {
-            document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
-        }
+        // التمرير يُدار داخل كل شاشة — لا حاجة لتغيير body overflow
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
         
         const contentDiv = targetScreen.querySelector('.main-content') || targetScreen.querySelector('.acc-content');
         if (contentDiv) {
@@ -505,7 +501,7 @@ const scanImageBtn = document.getElementById('scan-image-btn');
 const fileInput = document.getElementById('qr-input-file');
 
 document.querySelectorAll('.qr-trigger').forEach(img => {
-    img.style.cursor = 'pointer';
+    
     img.addEventListener('click', startScanner);
 });
 
