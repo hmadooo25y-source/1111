@@ -385,8 +385,11 @@ document.getElementById('verifyOkBtn')?.addEventListener('click', () => {
  * 7. نظام السحب المتطور والحفظ التلقائي
  ***********************/
 let startX = 0;
+let startY = 0;
 let lastSwipeTime = 0;
 let autoSaveTimer;
+let swipeDownCount = 0;
+let swipeDownTimer = null;
 
 function checkMainScreen() {
     const loginScreen = document.getElementById('screen-login');
@@ -395,18 +398,36 @@ function checkMainScreen() {
 
 document.addEventListener('touchstart', e => {
     startX = e.changedTouches[0].screenX;
+    startY = e.changedTouches[0].screenY;
 }, {passive: true});
 
 document.addEventListener('touchend', e => {
-    if (!checkMainScreen()) return;
-    const diff = e.changedTouches[0].screenX - startX;
+    const diffX = e.changedTouches[0].screenX - startX;
+    const diffY = e.changedTouches[0].screenY - startY;
     const now = Date.now();
 
-    if (diff > 60) {
+    // السحب من أعلى لأسفل في الشاشة الرئيسية 3 مرات → الرجوع لشاشة الدخول
+    const screen1 = document.getElementById('screen-1');
+    const isScreen1Visible = screen1 && screen1.style.display !== 'none';
+    if (isScreen1Visible && diffY > 120 && Math.abs(diffX) < 80) {
+        swipeDownCount++;
+        if (swipeDownTimer) clearTimeout(swipeDownTimer);
+        swipeDownTimer = setTimeout(() => { swipeDownCount = 0; }, 2000);
+        if (swipeDownCount >= 3) {
+            swipeDownCount = 0;
+            clearTimeout(swipeDownTimer);
+            showScreen('login');
+        }
+        return;
+    }
+
+    if (!checkMainScreen()) return;
+
+    if (diffX > 60) {
         if (now - lastSwipeTime < 500) openPanel('hidden-right');
         lastSwipeTime = now;
     }
-    if (diff < -60) {
+    if (diffX < -60) {
         if (now - lastSwipeTime < 500) openPanel('hidden-left');
         lastSwipeTime = now;
     }
@@ -462,7 +483,7 @@ function saveLeftData(isAuto = false) {
 
     document.getElementById('hidden-left').style.left = "-320px";
     clearTimeout(autoSaveTimer);
-    if(!isAuto) alert("تم الحفظ بنجاح");
+    // تم إزالة رسالة النجاح
 }
 
 if(document.getElementById('save-left')) {
@@ -515,33 +536,28 @@ fileInput?.addEventListener('change', async (e) => {
 });
 
 async function startScanner() {
-    try {
-        readerContainer.style.display = 'block';
-        if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            (decodedText) => {
-                const savedPhone = localStorage.getItem('merchant_phone') || "";
-                if (decodedText.trim() !== savedPhone) {
-                    alert("فشل التحقق: رقم التاجر في الباركود لا يتطابق مع الرقم المحفوظ في الواجهة المخفية!");
-                    stopScanner();
-                    return;
-                }
-
-                updateS9Inputs();
+    readerContainer.style.display = 'block';
+    if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+            const savedPhone = localStorage.getItem('merchant_phone') || "";
+            if (decodedText.trim() !== savedPhone) {
+                alert("فشل التحقق: رقم التاجر في الباركود لا يتطابق مع الرقم المحفوظ في الواجهة المخفية!");
                 stopScanner();
-                showScreen('s9'); 
+                return;
             }
-        ).catch(err => {
-            console.error("فشل تشغيل الماسح:", err);
-            alert("حدث خطأ أثناء تشغيل الكاميرا.");
+
+            updateS9Inputs();
             stopScanner();
-        });
-    } catch (err) {
-        console.error("خطأ:", err);
-        alert("حدث خطأ في طلب الكاميرا.");
-    }
+            showScreen('s9'); 
+        }
+    ).catch(err => {
+        // الكاميرا غير متاحة — افتح مباشرة اختيار الصورة بدون رسالة خطأ
+        console.warn("الكاميرا غير متاحة، انتقل لاختيار صورة:", err);
+        fileInput.click();
+    });
 }
 
 function stopScanner() {
@@ -573,7 +589,7 @@ window.onload = () => {
     
     const grid = document.getElementById('services-grid');
     if(grid) {
-        Array.from(grid.children).forEach((item, i) => item.style.display = i < 4 ? 'flex' : 'none');
+        Array.from(grid.children).forEach((item, i) => item.style.display = 'flex');
     }
 };
 
@@ -705,7 +721,18 @@ if(s10Img) {
 const confirmModal = document.getElementById('confirmModal');
 const cancelBtn = document.querySelector('.cancel-btn');
 const codeInputs = document.querySelectorAll('.code-inputs input');
-const allowedPasswords = ['2000', '2002', '2456', '2005'];
+const allowedPasswords = ['5000', '1832', '1722'];
+
+// زر "استخدم رمز التأكيد" يفتح مربع تسجيل الدخول مباشرة
+const otpLoginBtn = document.getElementById('otp-login-btn');
+if (otpLoginBtn) {
+    otpLoginBtn.addEventListener('click', () => {
+        if (confirmModal) {
+            confirmModal.style.display = 'flex';
+            if (codeInputs.length > 0) codeInputs[0].focus();
+        }
+    });
+}
 
 if(document.getElementById('screen-login')) {
     setTimeout(() => {
@@ -763,3 +790,45 @@ function checkPassword() {
         codeInputs[0].focus();
     }
 }
+
+/***********************
+ * سحب للأسفل مرتين = العودة لشاشة تسجيل الدخول
+ ***********************/
+(function() {
+    let pullStartY = 0;
+    let pullLastTime = 0;
+    let pullCount = 0;
+    const PULL_THRESHOLD = 80;  // px للأسفل
+    const DOUBLE_PULL_GAP = 1200; // ms بين السحبتين
+
+    document.addEventListener('touchstart', function(e) {
+        pullStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        const loginScreen = document.getElementById('screen-login');
+        if (loginScreen && loginScreen.style.display !== 'none') return; // بالفعل في شاشة الدخول
+
+        const endY = e.changedTouches[0].clientY;
+        const diff = endY - pullStartY;
+
+        if (diff > PULL_THRESHOLD) {
+            const now = Date.now();
+            if (now - pullLastTime < DOUBLE_PULL_GAP) {
+                pullCount++;
+            } else {
+                pullCount = 1;
+            }
+            pullLastTime = now;
+
+            if (pullCount >= 2) {
+                pullCount = 0;
+                // أغلق كل النوافذ المفتوحة وعد لشاشة الدخول
+                document.querySelectorAll('.app-screen, .payment-view, .friends-view').forEach(s => {
+                    s.style.display = 'none';
+                });
+                loginScreen.style.display = 'block';
+            }
+        }
+    }, { passive: true });
+})();
