@@ -81,19 +81,19 @@ body {
 .app-screen, .payment-view, #screen-3, #screen-4, #screen-5, #screen-6, .full-screen-app {
     width: 100%;
     max-width: 480px; 
-    height: 100vh;     /* تم التعديل لتفعيل التمرير الداخلي */
-    height: 100dvh;    /* تم التعديل لدعم الجوال */
-    overflow: hidden;  /* تم التعديل لمنع تمدد الشاشة بأكملها */
+    height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: #ececec;
+    overflow: hidden;
 }
 
 .page-body, .container, .app-wrapper, .content, .app-container, .main-content {
     flex: 1;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* تم التعديل لتفعيل التمرير السلس على الهواتف */
+    overflow-x: hidden;
     width: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ===================== الشاشة 1 ===================== */
@@ -101,8 +101,8 @@ body {
     background-image: url('https://i.imgur.com/OclsG0e.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    background-attachment: fixed;
-    padding: 12px 15px 40px 15px; /* تم إضافة مساحة سفلية (40px) لضمان عدم قص المحتوى */
+    background-attachment: scroll;
+    padding: 12px 15px;
 }
 
 .white-balance-card {
@@ -916,18 +916,3 @@ body {
     padding: 20px 10px !important; /* مضاعفة حجم الخلفية الرمادية (التصميم الأصلي كان 10px) */
 }
 
-/* ===================== إخفاء شريط التمرير (إضافة جديدة) ===================== */
-/* إخفاء شريط التمرير مع الإبقاء على وظيفة السحب */
-.page-body::-webkit-scrollbar,
-.container::-webkit-scrollbar,
-.app-wrapper::-webkit-scrollbar,
-.content::-webkit-scrollbar,
-.app-container::-webkit-scrollbar,
-.main-content::-webkit-scrollbar {
-    display: none;
-}
-
-.page-body, .container, .app-wrapper, .content, .app-container, .main-content {
-    -ms-overflow-style: none;  /* لمتصفح IE و Edge */
-    scrollbar-width: none;  /* لمتصفح Firefox */
-}
