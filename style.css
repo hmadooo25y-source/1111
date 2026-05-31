@@ -18,13 +18,11 @@ input:focus, button:focus, .service-card:focus {
 }
 
 body {
-    background-color: #555;
+    background-color: #ececec;
     display: flex;
     justify-content: center;
     direction: rtl;
     min-height: 100vh;
-    margin: 0;
-    padding: 0;
 }
 
 /* ===================== الهيدر ===================== */
@@ -82,58 +80,29 @@ body {
 /* ===================== شاشات التطبيق (Responsive) ===================== */
 .app-screen, .payment-view, #screen-3, #screen-4, #screen-5, #screen-6, .full-screen-app {
     width: 100%;
-    max-width: 100%;
-    height: 100%;
-    min-height: unset;
+    max-width: 480px; 
+    height: 100vh;     /* تم التعديل لتفعيل التمرير الداخلي */
+    height: 100dvh;    /* تم التعديل لدعم الجوال */
+    overflow: hidden;  /* تم التعديل لمنع تمدد الشاشة بأكملها */
     display: flex;
     flex-direction: column;
     background-color: #ececec;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 .page-body, .container, .app-wrapper, .content, .app-container, .main-content {
     flex: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* تم التعديل لتفعيل التمرير السلس على الهواتف */
     width: 100%;
 }
 
 /* ===================== الشاشة 1 ===================== */
-
-/* الشاشة الرئيسية: الهيدر ثابت + المحتوى قابل للتمرير مع خلفية ثابتة */
-#screen-1 {
-    overflow: hidden; /* منع تمرير الشاشة كلها */
-}
-
-.main-content-s1 {
-    position: relative;
-    overflow-y: auto;   /* تفعيل التمرير العمودي فقط هنا */
-    -webkit-overflow-scrolling: touch; /* تمرير ناعم على iOS */
-    height: calc(100% - var(--header-h, 55px)); /* ارتفاع المنطقة ناقص الهيدر */
-}
-
-/* طبقة الخلفية الثابتة خلف المحتوى */
-.main-content-s1::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('https://i.imgur.com/OclsG0e.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    z-index: -1;
-    pointer-events: none;
-}
-
 .page-body {
     background-image: url('https://i.imgur.com/OclsG0e.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    padding: 12px 15px;
+    padding: 12px 15px 40px 15px; /* تم إضافة مساحة سفلية (40px) لضمان عدم قص المحتوى */
 }
 
 .white-balance-card {
@@ -179,7 +148,7 @@ body {
     row-gap: 40px;
     column-gap: 15px;
     padding-top: 20px;
-    padding-bottom: 80px; /* مساحة إضافية في الأسفل لضمان ظهور آخر عنصر */
+    padding-bottom: 50px;
 }
 
 .service-card {
@@ -672,14 +641,13 @@ body {
 
 .horizontal-payments-container {
     display: flex;
-    justify-content: space-evenly;
-    gap: 0;
+    justify-content: space-evenly; 
     width: 100%;
     flex-wrap: nowrap;
-    padding: 0;
+    padding: 0; 
 }
 .horizontal-payments-container .payment-card { margin-right: 0; }
-.horizontal-payments-container .payment-img { width: 150px; height: auto; }
+.horizontal-payments-container .payment-img { width: 160px; height: auto; }
 
 #screen-9 {
     position: fixed;
@@ -713,7 +681,7 @@ body {
 
 .login-viewport {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background-color: #f1f1f1;
     position: relative;
     overflow-y: auto;
@@ -733,13 +701,14 @@ body {
     border-radius: 12px; font-weight: 700;
 }
 
-#screen-login .form-container { padding: 10px 25px; text-align: right; }
-#screen-login .group { margin-bottom: 10px; }
+#screen-login .form-container { padding: 20px 25px; text-align: right; }
+#screen-login .group { margin-bottom: 25px; }
 #screen-login label { display: block; font-weight: 700; margin-bottom: 8px; color: #333;}
 #screen-login .login-input {
     width: 100%; height: 45px; border: none; border-bottom: 2px solid #ccc;
     background: transparent; font-size: 1.1rem; outline: none; border-radius: 0; padding: 0 10px;
 }
+#screen-login .link { margin-top: 8px; color: var(--link-color); font-size: 0.9rem; font-weight: 700; cursor: pointer; }
 
 #screen-login .login-btn {
     width: 100%; height: 55px; border: none; border-radius: 14px;
@@ -747,13 +716,9 @@ body {
     background: var(--main-gradient); cursor: pointer;
 }
 
-#screen-login .cards-grid { display: flex; justify-content: center; gap: 16px; margin-top: 15px; padding: 0 10px; }
-#screen-login .card-item { flex: 1; max-width: 160px; display: flex; flex-direction: column; align-items: center; }
-#screen-login .card-item > img { width: 100%; height: auto; display: block; }
-#screen-login .contact-banner-img { width: 100%; border-radius: 10px; margin-bottom: 6px; display: block; }
-#screen-login .contact-icon-wrap { display: flex; flex-direction: column; align-items: center; width: 100%; }
-#screen-login .contact-icon-wrap img { width: 100%; max-width: 130px; height: auto; display: block; }
-#screen-login .card-label { font-size: 0.85rem; color: #555; margin-top: 5px; text-align: center; }
+#screen-login .cards-grid { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+#screen-login .card-item { flex: 1; max-width: 120px; }
+#screen-login .card-item img { width: 100%; height: auto; }
 
 /* المودال الخاص بتسجيل الدخول */
 .login-modal {
@@ -770,7 +735,7 @@ body {
 
 .login-modal .code-inputs { display: flex; justify-content: space-between; margin-bottom: 20px; direction: ltr; }
 .login-modal .code-inputs input {
-    width: 50px; height: 55px; text-align: center; font-size: 40px;
+    width: 50px; height: 55px; text-align: center; font-size: 20px;
     border: 2px solid #ddd; border-radius: 10px; background: #fff;
 }
 
@@ -951,219 +916,18 @@ body {
     padding: 20px 10px !important; /* مضاعفة حجم الخلفية الرمادية (التصميم الأصلي كان 10px) */
 }
 
-
-/* ===================== شاشة الدفع لتاجر (screen-7 محسّن) ===================== */
-.merchant-pay-card {
-    flex: 1;
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 20px 12px 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    border: 1.5px solid #eeeeee;
-}
-.merchant-pay-card:active {
-    transform: scale(0.97);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-.merchant-pay-icon-wrap {
-    width: 90px;
-    height: 90px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.merchant-pay-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 6px rgba(83,70,210,0.15));
-}
-.merchant-pay-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #5346D2;
-    text-align: center;
-    line-height: 1.4;
+/* ===================== إخفاء شريط التمرير (إضافة جديدة) ===================== */
+/* إخفاء شريط التمرير مع الإبقاء على وظيفة السحب */
+.page-body::-webkit-scrollbar,
+.container::-webkit-scrollbar,
+.app-wrapper::-webkit-scrollbar,
+.content::-webkit-scrollbar,
+.app-container::-webkit-scrollbar,
+.main-content::-webkit-scrollbar {
+    display: none;
 }
 
-/* =====================================================================
-   RESPONSIVE — يتناسب مع جميع أحجام شاشات الموبايل
-   ===================================================================== */
-
-/* --- قيم أساسية متغيرة حسب حجم الشاشة --- */
-:root {
-    --header-h:      clamp(48px, 7vw, 60px);
-    --font-xs:       clamp(10px, 2.8vw, 13px);
-    --font-sm:       clamp(12px, 3.2vw, 15px);
-    --font-md:       clamp(14px, 3.8vw, 18px);
-    --font-lg:       clamp(16px, 4.5vw, 22px);
-    --font-xl:       clamp(20px, 5.5vw, 28px);
-    --font-xxl:      clamp(28px, 9vw, 48px);
-    --pad-h:         clamp(10px, 4vw, 20px);
-    --pad-v:         clamp(8px,  2.5vw, 16px);
-    --radius:        clamp(8px,  2.5vw, 16px);
-    --icon-sm:       clamp(22px, 6vw, 32px);
-    --icon-md:       clamp(36px, 9vw, 52px);
-    --icon-lg:       clamp(50px, 13vw, 80px);
-    --service-card:  clamp(110px, 28vw, 160px);
-    --btn-h:         clamp(42px, 11vw, 58px);
-    --input-h:       clamp(38px, 10vw, 50px);
-}
-
-/* ---- الهيدر ---- */
-.main-header {
-    height: var(--header-h);
-    padding: 0 var(--pad-h);
-}
-.header-custom-icon { width: clamp(24px, 6.5vw, 34px); }
-.bell-icon { font-size: clamp(16px, 4.5vw, 22px); }
-.badge-outline {
-    width:  clamp(13px, 3.5vw, 18px);
-    height: clamp(13px, 3.5vw, 18px);
-    font-size: clamp(8px, 2.2vw, 11px);
-}
-
-/* ---- شاشة تسجيل الدخول ---- */
-#screen-login .top-bar { height: var(--header-h); padding-right: clamp(40px, 12vw, 70px); }
-#screen-login .top-title { font-size: clamp(0.85rem, 3.5vw, 1.1rem); }
-#screen-login .menu { font-size: clamp(1.1rem, 4vw, 1.6rem); }
-#screen-login .lang { width: clamp(36px, 9vw, 48px); height: clamp(36px, 9vw, 48px); font-size: clamp(12px, 3vw, 15px); }
-#screen-login .lang-container { padding: clamp(10px, 3vw, 22px) clamp(12px, 4vw, 22px) 0; }
-#screen-login .form-container { padding: clamp(6px, 2vw, 14px) clamp(14px, 5vw, 28px); }
-#screen-login .group { margin-bottom: clamp(6px, 2vw, 14px); }
-#screen-login .login-input { height: var(--input-h); font-size: clamp(0.9rem, 3.5vw, 1.15rem); }
-#screen-login .login-btn {
-    height: var(--btn-h);
-    font-size: clamp(0.9rem, 3.8vw, 1.15rem);
-    margin-bottom: clamp(8px, 2.5vw, 18px);
-    border-radius: clamp(10px, 3vw, 16px);
-}
-#screen-login .cards-grid { gap: clamp(10px, 3vw, 20px); margin-top: clamp(8px, 2.5vw, 18px); }
-#screen-login .card-item { max-width: clamp(120px, 35vw, 170px); }
-
-/* مودال كود الدخول */
-.login-modal-content { width: clamp(260px, 85vw, 360px); padding: clamp(16px, 5vw, 28px); border-radius: clamp(14px, 4vw, 22px); }
-.login-modal .modal-title { font-size: clamp(1.1rem, 4vw, 1.4rem); }
-.login-modal .modal-sub { font-size: clamp(0.8rem, 3vw, 1rem); }
-.login-modal .code-inputs input {
-    width:  clamp(40px, 11vw, 56px);
-    height: clamp(44px, 12vw, 62px);
-    font-size: clamp(16px, 5vw, 22px);
-    border-radius: clamp(7px, 2vw, 12px);
-}
-
-/* ---- الشاشة الرئيسية (s1) ---- */
-.white-balance-card { padding: clamp(10px, 3vw, 16px) clamp(14px, 4vw, 20px); border-radius: clamp(8px, 2.5vw, 14px); }
-.welcome-text { font-size: clamp(13px, 3.8vw, 19px); }
-.amount-number-system { font-size: var(--font-xxl); }
-.currency-label-thin { font-size: clamp(22px, 6.5vw, 40px); }
-.info-strip-row { padding: clamp(5px, 1.5vw, 9px) clamp(10px, 3vw, 18px); font-size: var(--font-sm); }
-.all-services-title-left { font-size: var(--font-sm); padding: clamp(6px, 1.5vw, 10px) 5px; }
-.services-layout-grid {
-    column-gap: clamp(8px, 3vw, 18px);
-    row-gap:    clamp(20px, 7vw, 44px);
-    padding-top: clamp(12px, 4vw, 24px);
-}
-.service-card img {
-    width:  var(--service-card);
-    height: var(--service-card);
-}
-
-/* ---- الشاشة 2 و 7 (payment-view) ---- */
-.main-title { font-size: clamp(15px, 4.2vw, 21px); margin-bottom: clamp(20px, 7vw, 40px); }
-.payment-img { width: clamp(110px, 35vw, 170px); height: clamp(110px, 35vw, 170px); }
-.horizontal-payments-container { gap: clamp(16px, 5vw, 36px); }
-
-/* ---- الشاشة 3 (الأصدقاء) ---- */
-.page-main-title { font-size: clamp(16px, 4.5vw, 22px); margin: clamp(6px, 2vw, 12px) 0 clamp(10px, 3vw, 18px); }
-.search-container { padding: 0 clamp(12px, 4vw, 22px); margin-bottom: clamp(12px, 3.5vw, 22px); }
-.search-field { height: clamp(32px, 8.5vw, 40px); font-size: clamp(14px, 3.8vw, 19px); }
-.sub-title.thin-title { font-size: clamp(13px, 3.5vw, 17px); padding: 0 clamp(12px, 4vw, 22px); }
-.contact-card { min-width: clamp(140px, 42vw, 200px); padding: clamp(7px, 2vw, 12px) clamp(5px, 1.5vw, 8px); }
-.main-name { font-size: clamp(11px, 3vw, 15px); }
-.hani-logo { width: clamp(50px, 14vw, 70px); height: clamp(36px, 10vw, 50px); }
-.rajab-logo-xl { width: clamp(54px, 15vw, 75px); height: clamp(40px, 11vw, 56px); }
-.list-item { padding: clamp(10px, 3vw, 17px) clamp(12px, 4vw, 22px); }
-.avatar-circle { width: var(--icon-md); height: var(--icon-md); font-size: clamp(14px, 4vw, 20px); margin-left: clamp(10px, 3vw, 17px); }
-.name-dark-gray { font-size: clamp(13px, 3.5vw, 16px); }
-.phone-dark-gray-large { font-size: clamp(11px, 3vw, 14px); }
-.fab-btn-bright-purple {
-    width:  clamp(44px, 12vw, 60px);
-    height: clamp(44px, 12vw, 60px);
-    font-size: clamp(22px, 6.5vw, 32px);
-    bottom: clamp(18px, 5vw, 34px);
-    left:   clamp(14px, 4vw, 24px);
-}
-
-/* ---- الشاشة 4 (إدخال الدفع) ---- */
-#screen-4 .content { padding: clamp(30px, 10vw, 55px) clamp(14px, 5vw, 24px); }
-#screen-4 .main-title { font-size: clamp(16px, 4.5vw, 22px); margin-bottom: clamp(20px, 7vw, 38px); }
-#screen-4 .form-group { margin-bottom: clamp(12px, 3.5vw, 20px); }
-#screen-4 .input-field { height: clamp(38px, 10vw, 50px); font-size: clamp(13px, 3.5vw, 16px); padding: 0 clamp(10px, 3vw, 18px); }
-#screen-4 .currency-badge { height: clamp(36px, 9.5vw, 46px); min-width: clamp(50px, 13vw, 70px); font-size: clamp(12px, 3.2vw, 15px); }
-#screen-4 .pay-button { height: clamp(38px, 10vw, 48px); font-size: clamp(15px, 4.2vw, 20px); }
-#screen-4 .bank-name { font-size: clamp(13px, 3.8vw, 18px); }
-#screen-4 .bank-logo-xl { width: clamp(38px, 10vw, 54px); height: clamp(38px, 10vw, 54px); }
-
-/* ---- الشاشة 5 (تأكيد) ---- */
-#screen-5 .main-title { font-size: clamp(20px, 6vw, 28px); margin-bottom: clamp(24px, 8vw, 44px); }
-#screen-5 .label, #screen-5 .value { font-size: clamp(14px, 4vw, 18px); }
-#screen-5 .name { font-size: clamp(12px, 3.5vw, 16px); }
-#screen-5 .phone { font-size: clamp(14px, 4vw, 18px); }
-#screen-5 .palpay-icon { width: var(--icon-md); height: var(--icon-md); }
-#screen-5 .hint-msg { font-size: clamp(14px, 4.5vw, 21px); margin-top: clamp(16px, 5vw, 32px); margin-bottom: clamp(20px, 7vw, 52px); }
-#screen-5 .btn-confirm { font-size: clamp(16px, 5vw, 24px); padding: clamp(5px, 1.5vw, 8px) 0; border-radius: clamp(6px, 2vw, 10px); }
-
-/* ---- الشاشة 6 (نجاح التحويل) ---- */
-#screen-6 .image-section img { max-width: clamp(200px, 70vw, 330px); border-radius: clamp(8px, 2.5vw, 14px); }
-#screen-6 .success-message { font-size: clamp(15px, 4.5vw, 22px); }
-#screen-6 .data-box { max-width: clamp(260px, 85vw, 340px); padding: clamp(14px, 4.5vw, 22px); border-radius: clamp(8px, 2.5vw, 14px); }
-#screen-6 .receiver-info .name { font-size: clamp(14px, 4.2vw, 20px); }
-#screen-6 .receiver-info .phone { font-size: clamp(12px, 3.5vw, 17px); }
-#screen-6 .amount-row { font-size: clamp(14px, 4.2vw, 20px); }
-#screen-6 .transaction-row { font-size: clamp(12px, 3.5vw, 17px); }
-#screen-6 .confirm-button { height: clamp(38px, 10vw, 50px); font-size: clamp(14px, 4.2vw, 20px); border-radius: clamp(8px, 2.5vw, 12px); }
-
-/* ---- تفاصيل الحساب ---- */
-.acc-main-title { font-size: clamp(18px, 5vw, 26px) !important; }
-.acc-section-title { font-size: clamp(14px, 4vw, 18px) !important; }
-.acc-label-td, .acc-colon-td, .acc-num-td { font-size: clamp(12px, 3.2vw, 15px) !important; padding: clamp(4px, 1.2vw, 8px) clamp(6px, 2vw, 12px) !important; }
-.acc-balance-text { font-size: clamp(16px, 4.5vw, 22px) !important; }
-.acc-statement-table th, .acc-statement-table td { font-size: clamp(11px, 2.8vw, 14px) !important; }
-.acc-en-text { font-size: clamp(10px, 2.6vw, 13px); }
-
-/* ---- الإشعارات ---- */
-.notif-title-custom { font-size: clamp(16px, 5vw, 24px) !important; padding: clamp(12px, 4vw, 22px) 10px !important; }
-.notif-list-container { padding: clamp(6px, 2vw, 12px); }
-
-/* ---- القوائم الجانبية ---- */
-.hidden-panel-custom { width: clamp(220px, 78vw, 310px); padding: clamp(14px, 4vw, 22px); gap: clamp(10px, 2.5vw, 17px); }
-.panel-header { font-size: clamp(14px, 4vw, 18px); }
-.field-box label { font-size: clamp(12px, 3.2vw, 15px); }
-.field-box input { height: clamp(34px, 9vw, 44px); font-size: clamp(13px, 3.5vw, 16px); }
-.panel-btn { height: clamp(38px, 10vw, 48px); font-size: clamp(14px, 3.8vw, 17px); }
-
-/* ===================== شاشات صغيرة جداً (< 360px مثل Galaxy A01) ===================== */
-@media (max-width: 359px) {
-    .service-card img { width: 95px; height: 95px; }
-    .amount-number-system { font-size: 34px; }
-    .currency-label-thin { font-size: 26px; }
-    .payment-img { width: 100px; height: 100px; }
-    .login-modal .code-inputs input { width: 36px; height: 40px; }
-    #screen-login .card-item { max-width: 110px; }
-}
-
-/* ===================== شاشات كبيرة (> 430px مثل iPhone Plus / Pro Max) ===================== */
-@media (min-width: 430px) {
-    .service-card img { width: 165px; height: 165px; }
-    .payment-img { width: 175px; height: 175px; }
-    #screen-login .login-btn { height: 60px; }
-    #screen-login .card-item { max-width: 175px; }
-    .main-header { height: 62px; }
+.page-body, .container, .app-wrapper, .content, .app-container, .main-content {
+    -ms-overflow-style: none;  /* لمتصفح IE و Edge */
+    scrollbar-width: none;  /* لمتصفح Firefox */
 }
