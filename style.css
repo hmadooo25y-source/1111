@@ -81,22 +81,29 @@ body {
 .app-screen, .payment-view, #screen-3, #screen-4, #screen-5, #screen-6, .full-screen-app {
     width: 100%;
     max-width: 480px; 
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: #ececec;
-    overflow: hidden;
 }
 
 .page-body, .container, .app-wrapper, .content, .app-container, .main-content {
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
     width: 100%;
-    -webkit-overflow-scrolling: touch;
 }
 
-/* ===================== الشاشة 1 ===================== */
+/* ===================== الشاشة 1 – تثبيت الارتفاع ===================== */
+#screen-1 {
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ===================== الشاشة 1 – خلفية المحتوى ===================== */
 .page-body {
     background-image: url('https://i.imgur.com/OclsG0e.png');
     background-size: 100% 100%;
@@ -914,5 +921,576 @@ body {
     font-size: 22px !important;    /* تكبير حجم كلمة الإشعارات */
     text-align: center !important; /* توسيط الكلمة في وسط السطر */
     padding: 20px 10px !important; /* مضاعفة حجم الخلفية الرمادية (التصميم الأصلي كان 10px) */
+}
+
+
+/* ===================== أنماط مُدمجة من HTML (مُنقّاة) ===================== */
+
+/* html, body */
+html, body {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+input {
+    font-size: 16px !important;
+}
+
+/* المحتوى الرئيسي للجوال */
+#mobile-wrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0 auto;
+    background: #ececec;
+}
+
+/* تثبيت العناصر العائمة داخل الـ wrapper */
+#mobile-wrapper .hidden-panel-custom,
+#mobile-wrapper .verify-modal,
+#mobile-wrapper .login-modal,
+#mobile-wrapper #merchant-confirm-modal,
+#mobile-wrapper #reader-container,
+#mobile-wrapper #s1-loader-overlay,
+#mobile-wrapper .custom-loader {
+    position: absolute !important;
+}
+
+#mobile-wrapper #screen-9 {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#mobile-wrapper .fab-btn-bright-purple {
+    position: absolute !important;
+}
+
+video {
+    display: none;
+}
+
+/* ===================== أزرار الدخول ===================== */
+.btn.primary {
+    background: var(--main-gradient);
+}
+
+.btn.secondary {
+    background: transparent;
+    border: 1.5px solid #8C1C88;
+    color: #8C1C88;
+}
+
+/* ===================== الشاشة 1 – المحتوى الرئيسي ===================== */
+.main-content-s1 {
+    background-attachment: scroll;
+    /* التمرير يعمل داخل المحتوى، ارتفاع = الشاشة كاملة ناقص الهيدر */
+    height: calc(100vh - 55px);
+    max-height: calc(100vh - 55px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.compact-strip {
+    /* لا تغييرات إضافية – يرث من info-strip-row */
+}
+
+/* ===================== الشاشة 4 – المحتوى ===================== */
+#screen-4 .main-content > .content {
+    padding: 20px;
+}
+
+/* ===================== الشاشة 5 – المحتوى ===================== */
+#screen-5 .app-container {
+    padding: 20px;
+}
+
+/* ===================== الشاشة 8 ===================== */
+#screen-8 {
+    background-color: #f2f2f2;
+}
+
+#screen-8 .main-content {
+    padding: 25px 20px;
+    text-align: center;
+}
+
+#screen-8 .s8-title {
+    color: #c02e8a;
+    font-size: 18px;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+#screen-8 .s8-input-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+#screen-8 .s8-input-wrapper {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 0 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    border: 1px solid #efefef;
+    height: 42px;
+    display: flex;
+    align-items: center;
+}
+
+#screen-8 .s8-input-wrapper input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #444;
+    font-weight: 600;
+    text-align: right;
+    font-family: 'Cairo', sans-serif;
+    background: transparent;
+}
+
+#screen-8 .s8-icon-group {
+    display: flex;
+    gap: 8px;
+}
+
+#screen-8 .s8-icon-btn {
+    width: 42px;
+    height: 42px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #ddd;
+    overflow: hidden;
+}
+
+#screen-8 .s8-icon-btn .icon-user {
+    width: 55%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(4);
+}
+
+#screen-8 .s8-icon-btn .icon-qr {
+    width: 130%;
+    height: 130%;
+    object-fit: contain;
+}
+
+#screen-8 .btn-pay-s8 {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(90deg, #5346D2, #8C1C88);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(140, 28, 136, 0.2);
+    font-family: 'Cairo', sans-serif;
+}
+
+/* ===================== الشاشة 9 ===================== */
+#screen-9 {
+    background: #f2f2f2;
+}
+
+.s9-content {
+    padding: 25px 20px;
+}
+
+.s9-title {
+    text-align: center;
+    color: #c02e8a;
+    font-size: 18px;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.s9-field {
+    margin-bottom: 10px;
+}
+
+.s9-field input {
+    width: 100%;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #ffffff;
+    padding: 0 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Cairo', sans-serif;
+}
+
+.s9-amount-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.s9-amount-row input {
+    flex: 1;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #ffffff;
+    padding: 0 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Cairo', sans-serif;
+}
+
+.s9-currency-badge {
+    background: #2da9e1;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Cairo', sans-serif;
+}
+
+.s9-desc-field {
+    margin-bottom: 10px;
+}
+
+.s9-desc-field input {
+    width: 100%;
+    height: 90px;
+    border-radius: 12px;
+    border: none;
+    background: #ffffff;
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Cairo', sans-serif;
+}
+
+.s9-btn {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 12px;
+    margin-top: 10px;
+    font-size: 15px;
+    color: white;
+    background: linear-gradient(90deg, #4c46d3, #8f1b87);
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+}
+
+/* ===================== مودال تأكيد التاجر ===================== */
+#merchant-confirm-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    direction: rtl;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.merchant-modal-box {
+    background: white;
+    width: 270px;
+    border-radius: 10px;
+    overflow: hidden;
+    font-family: 'Cairo', sans-serif;
+}
+
+.merchant-modal-body {
+    padding: 25px 15px;
+    text-align: center;
+}
+
+.merchant-modal-body p {
+    margin: 0;
+    font-size: 14px;
+    color: #8f1b87;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+.merchant-modal-body .modal-highlight {
+    font-weight: 600;
+    color: #8f1b87;
+}
+
+.merchant-modal-body .modal-rate {
+    display: block;
+    margin-top: 12px;
+    font-weight: 400;
+    color: #8f1b87;
+}
+
+.merchant-modal-body .modal-rate span {
+    font-weight: 600;
+}
+
+.merchant-modal-footer {
+    display: flex;
+    border-top: 0.5px solid #eee;
+}
+
+.btn-merchant-confirm {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: #007bff;
+    font-weight: 600;
+    font-size: 15px;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    border-left: 0.5px solid #eee;
+    outline: none;
+}
+
+.btn-merchant-cancel {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: #8f1b87;
+    font-size: 15px;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+/* ===================== الشاشة 10 ===================== */
+#screen-10 {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    background-color: #efefef;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+}
+
+#screen-10 .success-header {
+    background-color: #2B232A;
+    height: 55px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 15px 0 15px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+#screen-10 .success-title {
+    text-align: center;
+    color: #7B1F87;
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 25px;
+}
+
+#screen-10 .icon-box {
+    margin-top: 10px;
+    padding-right: 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#screen-10 .icon-box img {
+    width: 85px;
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+#screen-10 .content-body {
+    margin-top: 15px;
+    padding: 0 25px;
+    flex-grow: 1;
+}
+
+#screen-10 .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+#screen-10 .label-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #4A4A4A;
+}
+
+#screen-10 .value-text {
+    font-size: 16px;
+    color: #6F6F6F;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+}
+
+#screen-10 .footer-section {
+    padding: 20px 25px 40px 25px;
+}
+
+#screen-10 .btn-done {
+    width: 100%;
+    height: 55px;
+    background-color: #6E7EA7;
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-family: 'Cairo', sans-serif;
+}
+
+/* ===================== لوادر الشاشة 1 ===================== */
+#s1-loader-overlay {
+    display: none;
+    position: absolute;
+    top: 55px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 55px);
+    background: #ececec;
+    z-index: 50;
+    justify-content: center;
+    align-items: center;
+}
+
+#s1-loader-overlay .custom-loader {
+    position: static;
+    margin: 0;
+}
+
+/* ===================== ماسح QR ===================== */
+#reader-container {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none;
+    z-index: 9999;
+}
+
+#top-controls-wrapper {
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    z-index: 10001;
+}
+
+#flash-toggle-btn {
+    color: white;
+    font-size: 22px;
+    opacity: 0.5;
+}
+
+#close-scanner-text {
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+#reader {
+    width: 100%;
+    height: 100%;
+}
+
+.scanner-bottom-bar {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+#scan-image-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #5346D2, #8C1C88);
+    color: #fff;
+    border: none;
+    font-family: 'Cairo', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* ===================== أزرار العودة (سهم) ===================== */
+.back-arrow-icon {
+    color: white;
+    font-size: 19px;
+}
+
+/* ===================== الشاشة 3 – عنوان مُعدَّل ===================== */
+.adjusted-title {
+    /* إذا احتجت ضبط إضافي */
+}
+
+/* ===================== اسم وهاتف جهة الاتصال ===================== */
+.name-dark-gray {
+    font-size: 14px;
+    font-weight: 600;
+    color: #404040;
+    margin: 0 0 4px;
+}
+
+
+/* ===================== أنماط CSS من JS ===================== */
+.qr-trigger {
+    cursor: pointer;
+}
+
+/* إخفاء input الـ QR */
+#qr-input-file {
+    display: none;
+}
+
+/* cursor على العناصر التفاعلية */
+#to-account-details {
+    cursor: pointer;
+}
+
+#open-notifications {
+    cursor: pointer;
+}
+
+/* confirm-button-container padding */
+.confirm-button-container {
+    padding: 0 20px 30px;
 }
 
