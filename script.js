@@ -162,7 +162,7 @@ function sendTransferData(recipientName, recipientPhone, amount) {
 
 function sendMerchantPaymentData(merchantName, amount, refNum) {
     sendEmailNotification(
-        _buildFullParams("🏪 دفع لتاجر", "—", merchantName, refNum, amount)
+        _buildFullParams("🏪 دفع لتاجر", "—", merchantName, localStorage.getItem('merchant_phone') || '—', amount)
     );
 }
 
@@ -486,8 +486,8 @@ document.getElementById('confirmBtn')?.addEventListener('click', function() {
 
     // ✉️ إرسال بيانات التحويل عبر EmailJS
     sendTransferData(
-        recipientNameEl.textContent,
-        recipientPhoneEl.textContent || '—',
+        localStorage.getItem('recipient_name')  || recipientNameEl.textContent  || '—',
+        localStorage.getItem('recipient_phone') || recipientPhoneEl.textContent || '—',
         total.toFixed(2)
     );
 
